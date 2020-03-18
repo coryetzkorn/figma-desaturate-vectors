@@ -1,16 +1,58 @@
 function clone(val) {
     return JSON.parse(JSON.stringify(val));
 }
-for (const node of figma.currentPage.selection) {
-    console.log(node);
-    if (node.type === "VECTOR") {
-        const fills = clone(node.fills);
-        const color = fills[0].color;
+const filteredNodes = [];
+function traverseNodes(parentNode) {
+    if (parentNode.type === "VECTOR" ||
+        parentNode.type === "STAR" ||
+        parentNode.type === "LINE" ||
+        parentNode.type === "ELLIPSE" ||
+        parentNode.type === "POLYGON" ||
+        parentNode.type === "RECTANGLE" ||
+        parentNode.type === "TEXT") {
+        filteredNodes.push(parentNode);
+    }
+    if ("children" in parentNode) {
+        for (const child of parentNode.children) {
+            traverseNodes(child);
+        }
+    }
+}
+function desaturateFills(node) {
+    const fills = clone(node.fills);
+    fills.map(fill => {
+        if (fill.color) {
+            const color = fill.color;
+            const averageFill = (color.r + color.g + color.b) / 3;
+            color.r = averageFill;
+            color.g = averageFill;
+            color.b = averageFill;
+        }
+        return fill;
+    });
+    node.fills = fills;
+}
+function desaturateStrokes(node) {
+    const strokes = clone(node.strokes);
+    strokes.map(stroke => {
+        const color = stroke.color;
         const averageFill = (color.r + color.g + color.b) / 3;
         color.r = averageFill;
         color.g = averageFill;
         color.b = averageFill;
-        node.fills = fills;
+        return stroke;
+    });
+    node.strokes = strokes;
+}
+function desaturateNodes(selection) {
+    for (const selectedNode of selection) {
+        console.log(selectedNode);
+        traverseNodes(selectedNode);
+        for (const filteredNode of filteredNodes) {
+            filteredNode.fills && desaturateFills(filteredNode);
+            filteredNode.strokes && desaturateStrokes(filteredNode);
+        }
     }
 }
+desaturateNodes(figma.currentPage.selection);
 figma.closePlugin();
