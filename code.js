@@ -18,8 +18,12 @@ function traverseNodes(parentNode) {
         }
     }
 }
+/**
+ * Account for luminosity
+ * https://www.tutorialspoint.com/dip/grayscale_to_rgb_conversion.htm
+ */
 function getGrayscaleValue(r, g, b) {
-    return (r + g + b) / 3;
+    return 0.3 * r + 0.59 * g + 0.11 * b;
 }
 function desaturateFills(node) {
     const fills = clone(node.fills);
