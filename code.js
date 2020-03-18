@@ -18,12 +18,15 @@ function traverseNodes(parentNode) {
         }
     }
 }
+function getGrayscaleValue(r, g, b) {
+    return (r + g + b) / 3;
+}
 function desaturateFills(node) {
     const fills = clone(node.fills);
     fills.map(fill => {
         if (fill.color) {
             const color = fill.color;
-            const averageFill = (color.r + color.g + color.b) / 3;
+            const averageFill = getGrayscaleValue(color.r, color.g, color.b);
             color.r = averageFill;
             color.g = averageFill;
             color.b = averageFill;
@@ -36,7 +39,7 @@ function desaturateStrokes(node) {
     const strokes = clone(node.strokes);
     strokes.map(stroke => {
         const color = stroke.color;
-        const averageFill = (color.r + color.g + color.b) / 3;
+        const averageFill = getGrayscaleValue(color.r, color.g, color.b);
         color.r = averageFill;
         color.g = averageFill;
         color.b = averageFill;
@@ -46,7 +49,6 @@ function desaturateStrokes(node) {
 }
 function desaturateNodes(selection) {
     for (const selectedNode of selection) {
-        console.log(selectedNode);
         traverseNodes(selectedNode);
         for (const filteredNode of filteredNodes) {
             filteredNode.fills && desaturateFills(filteredNode);
