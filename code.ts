@@ -32,12 +32,25 @@ function traverseNodes(parentNode: SceneNode) {
   }
 }
 
+interface Color {
+  r: number
+  g: number
+  b: number
+}
+
 /**
  * Account for luminosity
  * https://www.tutorialspoint.com/dip/grayscale_to_rgb_conversion.htm
  */
-function getGrayscaleValue(r: number, g: number, b: number): number {
-  return 0.3 * r + 0.59 * g + 0.11 * b
+function getGrayscaleValue(colors: Color): number {
+  return 0.3 * colors.r + 0.59 * colors.g + 0.11 * colors.b
+}
+
+function convertToGrayscale(colors: Color) {
+  const grayValue = getGrayscaleValue(colors)
+  colors.r = grayValue
+  colors.g = grayValue
+  colors.b = grayValue
 }
 
 function desaturateFills(node: EditableNode) {
@@ -45,12 +58,8 @@ function desaturateFills(node: EditableNode) {
   fills.map(fill => {
     if (fill.color) {
       const color = fill.color
-      const averageFill = getGrayscaleValue(color.r, color.g, color.b)
-      color.r = averageFill
-      color.g = averageFill
-      color.b = averageFill
+      convertToGrayscale(color)
     }
-    return fill
   })
   node.fills = fills
 }
@@ -59,11 +68,7 @@ function desaturateStrokes(node: EditableNode) {
   const strokes = clone(node.strokes)
   strokes.map(stroke => {
     const color = stroke.color
-    const averageFill = getGrayscaleValue(color.r, color.g, color.b)
-    color.r = averageFill
-    color.g = averageFill
-    color.b = averageFill
-    return stroke
+    convertToGrayscale(color)
   })
   node.strokes = strokes
 }
