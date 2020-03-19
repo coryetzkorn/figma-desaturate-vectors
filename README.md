@@ -25,10 +25,3 @@ And it can even handle edge cases such as:
 Note that it _does not_ work on bitmap images.
 
 For those, you can use Figma's built-in `saturation` slider, located in the image fill panel:
-
-## Algorthim
-To convert most accuratelt, colors to account for their luminosity.
-
-## Context
-
-When texts with SF fonts are rendered on iOS, their variant and tracking (letter spacing) are adjusted based on their point size and the user's accessibility settings. In Figma, the tracking must be manually applied to get a more accurate representation. Hence, **Fix San Francisco** is here to automate this process for you ♥
