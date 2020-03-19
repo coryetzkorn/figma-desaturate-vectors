@@ -1,7 +1,6 @@
 function clone(val) {
     return JSON.parse(JSON.stringify(val));
 }
-let includesBitmap = false;
 const filteredNodes = [];
 function traverseNodes(parentNode) {
     if (parentNode.type === "VECTOR" ||
@@ -46,7 +45,12 @@ function desaturateFills(node) {
             convertToGrayscale(fill.color);
         }
         else if (fill.type === "IMAGE") {
-            includesBitmap = true;
+            console.log(fill);
+            const fillClone = clone(fill);
+            const filtersClone = clone(fillClone.filters);
+            filtersClone.filters.saturation = -1;
+            fillClone.filters = filtersClone;
+            fill = fillClone;
         }
         else if (fill.type === "GRADIENT_RADIAL" ||
             fill.type === "GRADIENT_LINEAR" ||
@@ -75,10 +79,5 @@ function desaturateNodes(selection) {
         }
     }
 }
-function getMessage() {
-    if (includesBitmap) {
-        return "Only vector objects can be desaturated.";
-    }
-}
 desaturateNodes(figma.currentPage.selection);
-figma.closePlugin(getMessage());
+figma.closePlugin();

@@ -11,8 +11,6 @@ type EditableNode =
   | RectangleNode
   | TextNode
 
-let includesBitmap = false
-
 const filteredNodes: EditableNode[] = []
 
 function traverseNodes(parentNode: SceneNode) {
@@ -69,7 +67,12 @@ function desaturateFills(node: EditableNode) {
     if (fill.type === "SOLID") {
       convertToGrayscale(fill.color)
     } else if (fill.type === "IMAGE") {
-      includesBitmap = true
+      console.log(fill)
+      const fillClone = clone(fill)
+      const filtersClone = clone(fillClone.filters)
+      filtersClone.filters.saturation = -1
+      fillClone.filters = filtersClone
+      fill = fillClone
     } else if (
       fill.type === "GRADIENT_RADIAL" ||
       fill.type === "GRADIENT_LINEAR" ||
@@ -102,12 +105,6 @@ function desaturateNodes(selection) {
   }
 }
 
-function getMessage() {
-  if (includesBitmap) {
-    return "Only vector objects can be desaturated."
-  }
-}
-
 desaturateNodes(figma.currentPage.selection)
 
-figma.closePlugin(getMessage())
+figma.closePlugin()
