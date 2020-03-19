@@ -52,6 +52,7 @@ function desaturateStrokes(node) {
 function desaturateNodes(selection) {
     for (const selectedNode of selection) {
         traverseNodes(selectedNode);
+        console.log(filteredNodes);
         for (const filteredNode of filteredNodes) {
             filteredNode.fills && desaturateFills(filteredNode);
             filteredNode.strokes && desaturateStrokes(filteredNode);
