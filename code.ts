@@ -11,6 +11,8 @@ type EditableNode =
   | RectangleNode
   | TextNode
 
+let includesBitmap = false
+
 const filteredNodes: EditableNode[] = []
 
 function traverseNodes(parentNode: SceneNode) {
@@ -53,15 +55,31 @@ function convertToGrayscale(colors: Color) {
   colors.b = grayValue
 }
 
+function desaturateGradient(fill: GradientPaint) {
+  const fillClone = clone(fill)
+  fill.gradientStops.map(gradientStop => {
+    convertToGrayscale(gradientStop.color)
+  })
+  fill = fillClone
+}
+
 function desaturateFills(node: EditableNode) {
-  const fills = clone(node.fills)
-  fills.map(fill => {
-    if (fill.color) {
-      const color = fill.color
-      convertToGrayscale(color)
+  const fillsClone: Paint[] = clone(node.fills)
+  fillsClone.map(fill => {
+    if (fill.type === "SOLID") {
+      convertToGrayscale(fill.color)
+    } else if (fill.type === "IMAGE") {
+      includesBitmap = true
+    } else if (
+      fill.type === "GRADIENT_RADIAL" ||
+      fill.type === "GRADIENT_LINEAR" ||
+      fill.type === "GRADIENT_ANGULAR" ||
+      fill.type === "GRADIENT_DIAMOND"
+    ) {
+      desaturateGradient(fill)
     }
   })
-  node.fills = fills
+  node.fills = fillsClone
 }
 
 function desaturateStrokes(node: EditableNode) {
@@ -84,6 +102,12 @@ function desaturateNodes(selection) {
   }
 }
 
+function getMessage() {
+  if (includesBitmap) {
+    return "Only vector objects can be desaturated."
+  }
+}
+
 desaturateNodes(figma.currentPage.selection)
 
-figma.closePlugin()
+figma.closePlugin(getMessage())
